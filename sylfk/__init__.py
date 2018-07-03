@@ -22,7 +22,7 @@ class SYLFK:
             'Server':'Shiyanlou Framework'
             }
 
-        return Response('<h1>heloo framework</h1>',content_type='text/html',headers=headers,status=status)
+        return Response('<h1>hello framework</h1>',content_type='text/html',headers=headers,status=status)
 
     def run(self,host=None,port=None,**options):
         for key,value in options.items():
