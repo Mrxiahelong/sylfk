@@ -2,6 +2,23 @@ from werkzeug.serving import run_simple
 from sylfk.wsgi_adapter import wsgi_app
 from werkzeug.wrappers import Response
 from sylfk.exceptions as exceptions
+from sylfk.helper import parse_static_key
+
+＃定义常见服务异常的响应体
+ERROR_MAP={
+    '401':Response('<h1>401 Unknow or unsupport method</h1>',content_type='text/html;charset=UTF-8',status=401),
+    '404':Response('<h1>404 Source Not Found</h1>',content_type='text/html;charset=UTF-8',status=404),
+    '503':Response('<h1>503 Unknown function type</h1>',conent_type='text/html;charset=UTF-8',status=503)
+}
+#定义文件类型
+TYPE_MAP={
+    'css':'text/css',
+    'js':'text/js',
+    'png':'image/png',
+    'jpg':'image/jpeg',
+    'jpeg':'image/jpeg'
+    }
+
 class ExecFunc:
     def __init__(self,func,func_type,**options):
         self.func=func  ＃处理函数
@@ -32,7 +49,7 @@ class SYLFK:
             self.host=host
         if port:
             self.port=port
-
+        self.function_map['static']=ExecFunc(func=self.dispatch_static,func_type='static')
         run_simple(hostname=self.host,port=self.port,application=self,**options)
 
 
@@ -55,3 +72,22 @@ class SYLFK:
         self.url_map[url]=endpoint
         #添加节点与请求处理函数的映射
         self.function_map[endpoint]=ExecFunc(func,func_type,**options)
+  
+    #静态资源路由
+    def dispatch_static(self,static_path):
+        #判断资源文件是否在静态资源规则中，如果不存在，返回404状态码
+        if os.path.exists(static_path):
+            ＃获取资源文件后缀
+            key=parse_static_key(stayic_path):
+            ＃获取文件类型
+            doc_type=TYPE_MAP.get(key,'text/plain')
+
+            ＃获取文件内容
+            with open(static_path,'rb') as f:
+                rep=f.read()
+            #封装并返回响应体
+            return Response(rep,content_type=doc_type)
+        else:
+        ＃返回404页面并找到相应的响应体
+            return ERROR_MAP['404']
+            
